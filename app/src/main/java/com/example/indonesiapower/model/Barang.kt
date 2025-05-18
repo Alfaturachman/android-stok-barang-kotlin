@@ -15,7 +15,5 @@ data class Barang(
     val kondisi: String?,
     val gambar_barang: String?,
     val kode_kategori: Int?,
-    val nama_kategori: String?,
-    val jumlah: Int?,
-    val dibuat_tgl: String?
+    val nama_kategori: String?
 )

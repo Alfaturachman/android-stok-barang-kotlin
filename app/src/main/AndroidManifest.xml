@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +20,9 @@
         android:theme="@style/Theme.IndonesiaPower"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.barang.edit.EditBarangActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.barang.detail.DetailBarangActivity"
             android:exported="false" />

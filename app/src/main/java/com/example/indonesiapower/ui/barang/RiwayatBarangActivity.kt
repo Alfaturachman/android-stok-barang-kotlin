@@ -55,7 +55,10 @@ class RiwayatBarangActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Inisialisasi Adapter
-        adapter = RiwayatBarangAdapter(emptyList(), startForResult)
+        adapter = RiwayatBarangAdapter(emptyList(), startForResult) {
+            refreshData()
+        }
+
         recyclerView.adapter = adapter
 
         // Ambil id_user dari SharedPreferences
