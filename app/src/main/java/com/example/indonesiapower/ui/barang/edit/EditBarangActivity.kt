@@ -46,13 +46,13 @@ class EditBarangActivity : AppCompatActivity() {
     private lateinit var etType: TextInputEditText
     private lateinit var spinnerKondisi: Spinner
     private lateinit var etCatatanTambahan: TextInputEditText
-    private lateinit var ivGambarBarang: ImageView
     private lateinit var tvNamaFileGambar: TextView
     private lateinit var imageView: ImageView
     private lateinit var btnSimpan: Button
     private lateinit var btnKembali: ImageButton
 
     // Data dari intent
+    private var idBarang: Int = 0
     private var kodeBarang: Int = 0
     private var jenisBarang: String = ""
     private var namaBarang: String = ""
@@ -83,6 +83,7 @@ class EditBarangActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
         // Ambil data dari intent
+        idBarang = intent.getIntExtra("id_barang", 0)
         kodeBarang = intent.getIntExtra("kode_barang", 0)
         jenisBarang = intent.getStringExtra("jenis_barang") ?: ""
         namaBarang = intent.getStringExtra("nama_barang") ?: ""
@@ -259,7 +260,6 @@ class EditBarangActivity : AppCompatActivity() {
 
     private fun updateBarang() {
         // Ambil nilai dari form
-        val kodeBarang = etKodeBarang.text.toString()
         val updatedJenisBarang = spinnerJenisBarang.selectedItem.toString()
         val updatedNamaBarang = etNamaBarang.text.toString()
         val updatedPegawai = etPegawai.text.toString()
@@ -279,7 +279,7 @@ class EditBarangActivity : AppCompatActivity() {
         }
 
         // ✅ Log semua data sebelum dikirim
-        Log.d("UpdateBarang", "Kode Barang: $kodeBarang")
+        Log.d("UpdateBarang", "ID Barang: $idBarang")
         Log.d("UpdateBarang", "Jenis Barang: $updatedJenisBarang")
         Log.d("UpdateBarang", "Nama Barang: $updatedNamaBarang")
         Log.d("UpdateBarang", "Pegawai: $updatedPegawai")
@@ -297,7 +297,7 @@ class EditBarangActivity : AppCompatActivity() {
         Toast.makeText(this, "Menyimpan perubahan...", Toast.LENGTH_SHORT).show()
 
         // Konversi data ke MultipartBody.Part
-        val kodeBarangPart = MultipartBody.Part.createFormData("kode_barang", kodeBarang)
+        val idBarangPart = MultipartBody.Part.createFormData("id_barang", (idBarang ?: 0).toString())
         val jenisBarangPart = MultipartBody.Part.createFormData("jenis_barang", updatedJenisBarang)
         val namaBarangPart = MultipartBody.Part.createFormData("nama_barang", updatedNamaBarang)
         val pegawaiPart = MultipartBody.Part.createFormData("pegawai", updatedPegawai)
@@ -308,10 +308,7 @@ class EditBarangActivity : AppCompatActivity() {
         val typePart = MultipartBody.Part.createFormData("type", updatedType)
         val kondisiPart = MultipartBody.Part.createFormData("kondisi", updatedKondisi)
         val catatanPart = MultipartBody.Part.createFormData("catatan", updatedCatatan)
-        val kodeKategoriPart = MultipartBody.Part.createFormData(
-            "kode_kategori",
-            (selectedKodeKategori ?: 0).toString()
-        )
+        val kodeKategoriPart = MultipartBody.Part.createFormData("kode_kategori", (selectedKodeKategori ?: 0).toString())
 
         // Handle gambar (opsional - hanya jika ada perubahan gambar)
         val gambarPart = if (selectedGambarUri != null) {
@@ -326,7 +323,7 @@ class EditBarangActivity : AppCompatActivity() {
 
         // Panggil API untuk update
         RetrofitClient.instance.updateBarang(
-            kodeBarangPart,
+            idBarangPart,
             jenisBarangPart,
             namaBarangPart,
             pegawaiPart,

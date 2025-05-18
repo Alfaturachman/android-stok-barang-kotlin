@@ -27,7 +27,7 @@ interface ApiService {
     @Multipart
     @POST("update_barang.php")
     fun updateBarang(
-        @Part kode_barang: MultipartBody.Part,
+        @Part id_barang: MultipartBody.Part,
         @Part jenis_barang: MultipartBody.Part,
         @Part nama_barang: MultipartBody.Part,
         @Part pegawai: MultipartBody.Part,
@@ -37,8 +37,8 @@ interface ApiService {
         @Part merk: MultipartBody.Part,
         @Part type: MultipartBody.Part,
         @Part kondisi: MultipartBody.Part,
-        @Part catatan: MultipartBody.Part,
-        @Part gambar: MultipartBody.Part,
+        @Part catatan_tambahan: MultipartBody.Part,
+        @Part gambar_barang: MultipartBody.Part,
         @Part kode_kategori: MultipartBody.Part
     ): Call<ApiResponse<Barang>>
 
