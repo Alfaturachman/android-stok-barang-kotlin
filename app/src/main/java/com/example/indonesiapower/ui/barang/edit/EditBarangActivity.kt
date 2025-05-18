@@ -25,6 +25,7 @@ import android.widget.ImageButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
+import com.example.indonesiapower.model.Barang
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -65,6 +66,7 @@ class EditBarangActivity : AppCompatActivity() {
     private var catatanTambahan: String = ""
     private var gambarBarang: String? = null
 
+    private var selectedKodeKategori: Int? = null
     private var selectedGambarUri: Uri? = null
     private lateinit var selectGambarLauncher: ActivityResultLauncher<Intent>
     private var kategoriList: List<Kategori> = listOf()
@@ -220,6 +222,22 @@ class EditBarangActivity : AppCompatActivity() {
                     if (jenisBarangPosition >= 0) {
                         spinnerJenisBarang.setSelection(jenisBarangPosition)
                     }
+
+                    // Selected Spinner
+                    spinnerJenisBarang.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                            val selectedKategori = kategoriList[position]
+                            val kodeKategori = selectedKategori.kode_kategori
+                            val namaKategori = selectedKategori.nama_kategori
+                            selectedKodeKategori = selectedKategori.kode_kategori
+
+                            Log.d("EditBarangActivity", "Dipilih: $namaKategori (Kode: $kodeKategori)")
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>) {
+                            Log.d("EditBarangActivity", "Tidak ada kategori yang dipilih.")
+                        }
+                    }
                 } else {
                     Toast.makeText(
                         this@EditBarangActivity,
@@ -240,7 +258,8 @@ class EditBarangActivity : AppCompatActivity() {
     }
 
     private fun updateBarang() {
-        // Implementasi update barang ke API
+        // Ambil nilai dari form
+        val kodeBarang = etKodeBarang.text.toString()
         val updatedJenisBarang = spinnerJenisBarang.selectedItem.toString()
         val updatedNamaBarang = etNamaBarang.text.toString()
         val updatedPegawai = etPegawai.text.toString()
@@ -251,6 +270,7 @@ class EditBarangActivity : AppCompatActivity() {
         val updatedType = etType.text.toString()
         val updatedKondisi = spinnerKondisi.selectedItem.toString()
         val updatedCatatan = etCatatanTambahan.text.toString()
+        val kodeKategori = selectedKodeKategori
 
         // Validasi form
         if (updatedNamaBarang.isEmpty()) {
@@ -258,42 +278,96 @@ class EditBarangActivity : AppCompatActivity() {
             return
         }
 
+        // ✅ Log semua data sebelum dikirim
+        Log.d("UpdateBarang", "Kode Barang: $kodeBarang")
+        Log.d("UpdateBarang", "Jenis Barang: $updatedJenisBarang")
+        Log.d("UpdateBarang", "Nama Barang: $updatedNamaBarang")
+        Log.d("UpdateBarang", "Pegawai: $updatedPegawai")
+        Log.d("UpdateBarang", "Jabatan: $updatedJabatan")
+        Log.d("UpdateBarang", "Divisi: $updatedDivisi")
+        Log.d("UpdateBarang", "Status: $updatedStatus")
+        Log.d("UpdateBarang", "Merk: $updatedMerk")
+        Log.d("UpdateBarang", "Type: $updatedType")
+        Log.d("UpdateBarang", "Kondisi: $updatedKondisi")
+        Log.d("UpdateBarang", "Catatan: $updatedCatatan")
+        Log.d("UpdateBarang", "Kode Kategori: ${kodeKategori ?: "null"}")
+        Log.d("UpdateBarang", "Gambar URI: ${selectedGambarUri?.toString() ?: "Tidak ada"}")
+
         // Tampilkan loading
         Toast.makeText(this, "Menyimpan perubahan...", Toast.LENGTH_SHORT).show()
 
-        // Panggil API untuk update
-        // RetrofitClient.instance.updateBarang(...).enqueue(...)
+        // Konversi data ke MultipartBody.Part
+        val kodeBarangPart = MultipartBody.Part.createFormData("kode_barang", kodeBarang)
+        val jenisBarangPart = MultipartBody.Part.createFormData("jenis_barang", updatedJenisBarang)
+        val namaBarangPart = MultipartBody.Part.createFormData("nama_barang", updatedNamaBarang)
+        val pegawaiPart = MultipartBody.Part.createFormData("pegawai", updatedPegawai)
+        val jabatanPart = MultipartBody.Part.createFormData("jabatan", updatedJabatan)
+        val divisiPart = MultipartBody.Part.createFormData("divisi", updatedDivisi)
+        val statusPart = MultipartBody.Part.createFormData("status", updatedStatus)
+        val merkPart = MultipartBody.Part.createFormData("merk", updatedMerk)
+        val typePart = MultipartBody.Part.createFormData("type", updatedType)
+        val kondisiPart = MultipartBody.Part.createFormData("kondisi", updatedKondisi)
+        val catatanPart = MultipartBody.Part.createFormData("catatan", updatedCatatan)
+        val kodeKategoriPart = MultipartBody.Part.createFormData(
+            "kode_kategori",
+            (selectedKodeKategori ?: 0).toString()
+        )
 
-        // Contoh implementasi (sesuaikan dengan API Anda):
-        /*
+        // Handle gambar (opsional - hanya jika ada perubahan gambar)
+        val gambarPart = if (selectedGambarUri != null) {
+            getFilePart(selectedGambarUri!!) ?: run {
+                Toast.makeText(this, "Gagal memproses gambar", Toast.LENGTH_SHORT).show()
+                return
+            }
+        } else {
+            // Jika tidak ada gambar baru yang dipilih, kirim null atau kosong
+            MultipartBody.Part.createFormData("gambar", "")
+        }
+
+        // Panggil API untuk update
         RetrofitClient.instance.updateBarang(
-            kodeBarang,
-            updatedJenisBarang,
-            updatedNamaBarang,
-            updatedPegawai,
-            updatedJabatan,
-            updatedDivisi,
-            updatedStatus,
-            updatedMerk,
-            updatedType,
-            updatedKondisi,
-            updatedCatatan,
-            gambarBarang
+            kodeBarangPart,
+            jenisBarangPart,
+            namaBarangPart,
+            pegawaiPart,
+            jabatanPart,
+            divisiPart,
+            statusPart,
+            merkPart,
+            typePart,
+            kondisiPart,
+            catatanPart,
+            gambarPart,
+            kodeKategoriPart
         ).enqueue(object : Callback<ApiResponse<Barang>> {
             override fun onResponse(call: Call<ApiResponse<Barang>>, response: Response<ApiResponse<Barang>>) {
-                if (response.isSuccessful && response.body()?.status == true) {
-                    Toast.makeText(this@EditBarangActivity, "Berhasil memperbarui barang", Toast.LENGTH_SHORT).show()
-                    finish()
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    if (result != null && result.status) {
+                        // Log data yang diupdate
+                        Log.d("UpdateBarang", "Nama Barang: $updatedNamaBarang")
+                        Log.d("UpdateBarang", "Jenis Barang: $updatedJenisBarang")
+                        Log.d("UpdateBarang", "Status: $updatedStatus")
+
+                        Toast.makeText(this@EditBarangActivity, "Berhasil memperbarui barang", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.e("UpdateBarang", "Gagal update barang. Error: $errorBody")
+                        Toast.makeText(this@EditBarangActivity, "Gagal memperbarui barang", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(this@EditBarangActivity, "Gagal memperbarui barang", Toast.LENGTH_SHORT).show()
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("UpdateBarang", "Response error: ${response.code()} - ${response.message()}. Error body: $errorBody")
+                    Toast.makeText(this@EditBarangActivity, "Error: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<Barang>>, t: Throwable) {
-                Toast.makeText(this@EditBarangActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("UpdateBarang", "Gagal menghubungi server: ${t.message}", t)
+                Toast.makeText(this@EditBarangActivity, "Gagal menghubungi server!", Toast.LENGTH_SHORT).show()
             }
         })
-        */
     }
 
     // Fungsi yang dipanggil saat LinearLayout diklik (sesuai dengan android:onClick di XML)

@@ -25,15 +25,21 @@ interface ApiService {
     fun tambahBarang(@Body body: RequestBody): Call<ResponseBody>
 
     @Multipart
-    @POST("edit_barang.php")
-    fun editBarang(
-        @Part id_user: Int,
-        @Part id_kategori: MultipartBody.Part,
-        @Part nama: MultipartBody.Part,
-        @Part judul: MultipartBody.Part,
-        @Part url: MultipartBody.Part,
+    @POST("update_barang.php")
+    fun updateBarang(
+        @Part kode_barang: MultipartBody.Part,
+        @Part jenis_barang: MultipartBody.Part,
+        @Part nama_barang: MultipartBody.Part,
+        @Part pegawai: MultipartBody.Part,
+        @Part jabatan: MultipartBody.Part,
+        @Part divisi: MultipartBody.Part,
+        @Part status: MultipartBody.Part,
+        @Part merk: MultipartBody.Part,
+        @Part type: MultipartBody.Part,
+        @Part kondisi: MultipartBody.Part,
+        @Part catatan: MultipartBody.Part,
         @Part gambar: MultipartBody.Part,
-        @Part deskripsi: MultipartBody.Part
+        @Part kode_kategori: MultipartBody.Part
     ): Call<ApiResponse<Barang>>
 
     @POST("delete_barang.php")
