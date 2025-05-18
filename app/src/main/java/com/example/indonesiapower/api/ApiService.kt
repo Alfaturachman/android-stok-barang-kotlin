@@ -21,8 +21,23 @@ interface ApiService {
     @GET("get_all_barang.php")
     fun riwayatBarang(): Call<ApiResponse<List<Barang>>>
 
+    @Multipart
     @POST("tambah_barang.php")
-    fun tambahBarang(@Body body: RequestBody): Call<ResponseBody>
+    fun tambahBarang(
+        @Part kode_kategori: MultipartBody.Part,
+        @Part kode_barang: MultipartBody.Part,
+        @Part jenis_barang: MultipartBody.Part,
+        @Part nama_barang: MultipartBody.Part,
+        @Part pegawai: MultipartBody.Part,
+        @Part jabatan: MultipartBody.Part,
+        @Part divisi: MultipartBody.Part,
+        @Part status: MultipartBody.Part,
+        @Part merk: MultipartBody.Part,
+        @Part type: MultipartBody.Part,
+        @Part kondisi: MultipartBody.Part,
+        @Part catatan_tambahan: MultipartBody.Part,
+        @Part gambar: MultipartBody.Part
+    ): Call<ApiResponse<Barang>>
 
     @Multipart
     @POST("update_barang.php")

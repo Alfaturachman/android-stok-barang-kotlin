@@ -1,10 +1,13 @@
 package com.example.indonesiapower.ui.barang
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +20,7 @@ import com.example.indonesiapower.api.ApiResponse
 import com.example.indonesiapower.api.RetrofitClient
 import com.example.indonesiapower.R
 import com.example.indonesiapower.model.Barang
+import com.example.indonesiapower.ui.barang.tambah.TambahBarangActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,6 +38,7 @@ class RiwayatBarangActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,6 +53,13 @@ class RiwayatBarangActivity : AppCompatActivity() {
         val btnKembali: ImageButton = findViewById(R.id.btnKembali)
         btnKembali.setOnClickListener {
             finish()
+        }
+
+        // Button Tambah
+        val buttonTambah: Button = findViewById(R.id.buttonTambah)
+        buttonTambah.setOnClickListener {
+            val intent = Intent(this@RiwayatBarangActivity, TambahBarangActivity::class.java)
+            startActivity(intent)
         }
 
         // Inisialisasi RecyclerView

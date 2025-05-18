@@ -21,6 +21,18 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.pemeliharaan.edit.EditPemeliharaanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.pemeliharaan.tambah.TambahPemeliharaanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.pemeliharaan.RiwayatPemeliharaanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.barang.tambah.TambahBarangActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.barang.edit.EditBarangActivity"
             android:exported="false" />
         <activity

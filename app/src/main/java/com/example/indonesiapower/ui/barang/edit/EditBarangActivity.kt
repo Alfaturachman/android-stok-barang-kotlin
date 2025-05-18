@@ -82,6 +82,12 @@ class EditBarangActivity : AppCompatActivity() {
         window.statusBarColor = resources.getColor(R.color.white, theme)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
+        // Button Kembali
+        val btnKembali: ImageButton = findViewById(R.id.btnKembali)
+        btnKembali.setOnClickListener {
+            finish()
+        }
+
         // Ambil data dari intent
         idBarang = intent.getIntExtra("id_barang", 0)
         kodeBarang = intent.getIntExtra("kode_barang", 0)
@@ -98,7 +104,6 @@ class EditBarangActivity : AppCompatActivity() {
         gambarBarang = intent.getStringExtra("gambar_barang")
 
         // Inisialisasi View
-        btnKembali = findViewById(R.id.btnKembali)
         etKodeBarang = findViewById(R.id.etKodeBarang)
         spinnerJenisBarang = findViewById(R.id.spinnerJenisBarang)
         etNamaBarang = findViewById(R.id.etNamaBarang)
@@ -347,6 +352,7 @@ class EditBarangActivity : AppCompatActivity() {
                         Log.d("UpdateBarang", "Status: $updatedStatus")
 
                         Toast.makeText(this@EditBarangActivity, "Berhasil memperbarui barang", Toast.LENGTH_SHORT).show()
+                        setResult(RESULT_OK)
                         finish()
                     } else {
                         val errorBody = response.errorBody()?.string()
