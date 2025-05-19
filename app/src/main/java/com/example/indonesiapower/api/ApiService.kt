@@ -62,4 +62,8 @@ interface ApiService {
 
     @GET("get_all_kategori.php")
     fun getKategori(): Call<ApiResponse<List<Kategori>>>
+
+    //Pemeliharaan
+    @POST("delete_pemeliharaan.php")
+    fun deletePemeliharaan(@Body body: RequestBody): Call<ResponseBody>
 }

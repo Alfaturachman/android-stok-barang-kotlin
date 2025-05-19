@@ -75,10 +75,10 @@ class RiwayatBarangActivity : AppCompatActivity() {
 
         // Ambil id_user dari SharedPreferences
         idUser = getUserIdFromSharedPreferences()
-        fetchMediaKontributor()
+        fetchBarang()
     }
 
-    private fun fetchMediaKontributor() {
+    private fun fetchBarang() {
         RetrofitClient.instance.riwayatBarang().enqueue(object : Callback<ApiResponse<List<Barang>>> {
             override fun onResponse(
                 call: Call<ApiResponse<List<Barang>>>,
@@ -116,6 +116,6 @@ class RiwayatBarangActivity : AppCompatActivity() {
     }
 
     private fun refreshData() {
-        fetchMediaKontributor()
+        fetchBarang()
     }
 }
