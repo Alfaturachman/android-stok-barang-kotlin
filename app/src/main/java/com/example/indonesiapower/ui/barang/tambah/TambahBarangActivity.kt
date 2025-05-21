@@ -70,6 +70,7 @@ class TambahBarangActivity : AppCompatActivity() {
 
         // Inisialisasi View
         initViews()
+        loadKodeBarangOtomatis()
         setupImagePicker()
         loadKategori()
         setupSpinners()
@@ -229,6 +230,23 @@ class TambahBarangActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadKodeBarangOtomatis() {
+        RetrofitClient.instance.kodeBarangOtomatis().enqueue(object : Callback<ApiResponse<Barang>> {
+            override fun onResponse(call: Call<ApiResponse<Barang>>, response: Response<ApiResponse<Barang>>) {
+                if (response.isSuccessful && response.body()?.status == true) {
+                    val kodeBarang = response.body()?.data?.kode_barang ?: ""
+                    etKodeBarang.setText(kodeBarang.toString())
+                } else {
+                    Toast.makeText(this@TambahBarangActivity, "Gagal mendapatkan kode barang", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Barang>>, t: Throwable) {
+                Toast.makeText(this@TambahBarangActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
     private fun simpanBarang() {
         val kodeBarang = etKodeBarang.text.toString()
         val jenisBarang = spinnerJenisBarang.selectedItem.toString()
@@ -291,13 +309,16 @@ class TambahBarangActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ApiResponse<Barang>>, response: Response<ApiResponse<Barang>>) {
                 if (response.isSuccessful && response.body()?.status == true) {
                     Toast.makeText(this@TambahBarangActivity, "Barang berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                    setResult(RESULT_OK)
                     finish()
                 } else {
+                    Log.e("TambahBarang", "Response error: code=${response.code()}, body=${response.errorBody()?.string()}")
                     Toast.makeText(this@TambahBarangActivity, "Gagal menambahkan barang", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<Barang>>, t: Throwable) {
+                Log.e("TambahBarang", "Request failed", t)
                 Toast.makeText(this@TambahBarangActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })

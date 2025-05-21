@@ -1,6 +1,5 @@
-package com.example.indonesiapower.ui.barang
+package com.example.indonesiapower.ui.kategori
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -16,20 +15,22 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.indonesiapower.R
 import com.example.indonesiapower.api.ApiResponse
 import com.example.indonesiapower.api.RetrofitClient
-import com.example.indonesiapower.R
-import com.example.indonesiapower.model.Barang
-import com.example.indonesiapower.ui.barang.tambah.TambahBarangActivity
+import com.example.indonesiapower.model.Kategori
+import com.example.indonesiapower.ui.kategori.RiwayatKategoriActivity
+import com.example.indonesiapower.ui.kategori.RiwayatKategoriAdapter
+import com.example.indonesiapower.ui.kategori.tambah.TambahKategoriActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RiwayatBarangActivity : AppCompatActivity() {
+class RiwayatKategoriActivity : AppCompatActivity() {
 
     private var idUser: Int = -1
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RiwayatBarangAdapter
+    private lateinit var adapter: RiwayatKategoriAdapter
 
     // ActivityResultLauncher untuk menangkap hasil dari aktivitas lain
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -38,11 +39,10 @@ class RiwayatBarangActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_riwayat_barang)
+        setContentView(R.layout.activity_riwayat_kategori)
         supportActionBar?.hide()
 
         // Set status bar color dan mode light
@@ -58,16 +58,16 @@ class RiwayatBarangActivity : AppCompatActivity() {
         // Button Tambah
         val buttonTambah: Button = findViewById(R.id.buttonTambah)
         buttonTambah.setOnClickListener {
-            val intent = Intent(this@RiwayatBarangActivity, TambahBarangActivity::class.java)
+            val intent = Intent(this@RiwayatKategoriActivity, TambahKategoriActivity::class.java)
             startActivity(intent)
         }
 
         // Inisialisasi RecyclerView
-        recyclerView = findViewById(R.id.recyclerViewRiwayatBarang)
+        recyclerView = findViewById(R.id.recyclerViewRiwayatKategori)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Inisialisasi Adapter
-        adapter = RiwayatBarangAdapter(emptyList(), startForResult) {
+        adapter = RiwayatKategoriAdapter(emptyList(), startForResult) {
             refreshData()
         }
 
@@ -75,14 +75,14 @@ class RiwayatBarangActivity : AppCompatActivity() {
 
         // Ambil id_user dari SharedPreferences
         idUser = getUserIdFromSharedPreferences()
-        fetchBarang()
+        fetchKategori()
     }
 
-    private fun fetchBarang() {
-        RetrofitClient.instance.riwayatBarang().enqueue(object : Callback<ApiResponse<List<Barang>>> {
+    private fun fetchKategori() {
+        RetrofitClient.instance.riwayatKategori().enqueue(object : Callback<ApiResponse<List<Kategori>>> {
             override fun onResponse(
-                call: Call<ApiResponse<List<Barang>>>,
-                response: Response<ApiResponse<List<Barang>>>
+                call: Call<ApiResponse<List<Kategori>>>,
+                response: Response<ApiResponse<List<Kategori>>>
             ) {
                 Log.d("RiwayatMedia", "Response diterima dengan kode: ${response.code()}")
 
@@ -104,7 +104,7 @@ class RiwayatBarangActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<List<Barang>>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<List<Kategori>>>, t: Throwable) {
                 Log.e("RiwayatMedia", "Gagal menghubungi server: ${t.localizedMessage}", t)
             }
         })
@@ -116,6 +116,6 @@ class RiwayatBarangActivity : AppCompatActivity() {
     }
 
     private fun refreshData() {
-        fetchBarang()
+        fetchKategori()
     }
 }

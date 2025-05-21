@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.indonesiapower.databinding.FragmentDashboardBinding
 import com.example.indonesiapower.ui.barang.RiwayatBarangActivity
+import com.example.indonesiapower.ui.kategori.RiwayatKategoriActivity
 import com.example.indonesiapower.ui.pemeliharaan.RiwayatPemeliharaanActivity
 
 class DashboardFragment : Fragment() {
@@ -38,6 +39,12 @@ class DashboardFragment : Fragment() {
         // Pemeliharaan
         binding.cardViewPemeliharaan.setOnClickListener {
             val intent = Intent(requireContext(), RiwayatPemeliharaanActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Kategori
+        binding.cardViewKategori.setOnClickListener {
+            val intent = Intent(requireContext(), RiwayatKategoriActivity::class.java)
             startActivity(intent)
         }
 

@@ -9,11 +9,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.indonesiapower.R
 import com.example.indonesiapower.api.RetrofitClient
 import com.example.indonesiapower.model.Pemeliharaan
 import com.example.indonesiapower.ui.pemeliharaan.edit.EditPemeliharaanActivity
+import com.example.indonesiapower.utils.DateUtils.formatTanggalIndonesia
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -25,6 +28,7 @@ import retrofit2.Response
 
 class RiwayatPemeliharaanAdapter(
     private var pemeliharaanList: List<Pemeliharaan>,
+    private val startForResult: ActivityResultLauncher<Intent>,
     private val onDeleteSuccess: () -> Unit
 ) : RecyclerView.Adapter<RiwayatPemeliharaanAdapter.PemeliharaanViewHolder>() {
 
@@ -62,18 +66,18 @@ class RiwayatPemeliharaanAdapter(
         holder.tvPegawai.text = pemeliharaan.pegawai ?: "-"
         holder.tvJabatan.text = pemeliharaan.jabatan ?: "-"
         holder.tvDivisi.text = pemeliharaan.divisi ?: "-"
-        holder.tvTglMasuk.text = pemeliharaan.tgl_barang_masuk ?: "-"
-        holder.tvTglPemeliharaan.text = pemeliharaan.tgl_pemeliharaan_selanjutnya ?: "-"
+        holder.tvTglMasuk.text = formatTanggalIndonesia(pemeliharaan.tgl_barang_masuk)
+        holder.tvTglPemeliharaan.text = formatTanggalIndonesia(pemeliharaan.tgl_pemeliharaan_selanjutnya)
 
         // Set status with color
         holder.tvStatus.text = pemeliharaan.kondisi ?: "Tidak diketahui"
         val statusColor = when (pemeliharaan.kondisi?.lowercase()) {
-            "baik" -> R.color.badge_success
-            "rusak" -> R.color.badge_warning
-            "perbaikan" -> R.color.badge_info
+            "Sudah Diperbaiki" -> R.color.badge_success
+            "Rusak" -> R.color.badge_danger
+            "Butuh Perbaikan" -> R.color.badge_warning
             else -> R.color.badge_secondary
         }
-        holder.tvStatus.setBackgroundResource(statusColor)
+        holder.tvStatus.backgroundTintList = ContextCompat.getColorStateList(context, statusColor)
 
         // Edit button click
         holder.btnEdit.setOnClickListener {

@@ -37,6 +37,7 @@ class RiwayatBarangAdapter(
         val tvJudul: TextView = itemView.findViewById(R.id.tvJudul)
         val tvKategori: TextView = itemView.findViewById(R.id.tvKategori)
         val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
+        val tvPegawai: TextView = itemView.findViewById(R.id.tvPegawai)
         val ivMedia: ImageView = itemView.findViewById(R.id.ivMedia)
         val btnEdit: ImageView = itemView.findViewById(R.id.btnDetailStok)
         val btnDelete: ImageView = itemView.findViewById(R.id.btnHapusStok)
@@ -59,6 +60,7 @@ class RiwayatBarangAdapter(
 
         holder.tvJudul.text = barang.nama_barang ?: "Tanpa Nama"
         holder.tvKategori.text = "Kategori: ${barang.nama_kategori ?: "Tidak Diketahui"}"
+        holder.tvPegawai.text = "Pegawai: ${barang.pegawai ?: "Tidak Diketahui"}"
         holder.tvStatus.text = barang.kondisi ?: "Tidak diketahui"
 
         val statusColor = when (barang.kondisi?.lowercase()) {

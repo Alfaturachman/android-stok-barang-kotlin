@@ -19,10 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.indonesiapower.R
 import com.example.indonesiapower.api.ApiResponse
 import com.example.indonesiapower.api.RetrofitClient
-import com.example.indonesiapower.model.Barang
-import com.example.indonesiapower.ui.barang.RiwayatBarangActivity
-import com.example.indonesiapower.ui.barang.RiwayatBarangAdapter
-import com.example.indonesiapower.ui.barang.tambah.TambahBarangActivity
+import com.example.indonesiapower.model.Pemeliharaan
 import com.example.indonesiapower.ui.pemeliharaan.tambah.TambahPemeliharaanActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,7 +29,7 @@ class RiwayatPemeliharaanActivity : AppCompatActivity() {
 
     private var idUser: Int = -1
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RiwayatBarangAdapter
+    private lateinit var adapter: RiwayatPemeliharaanAdapter
 
     // ActivityResultLauncher untuk menangkap hasil dari aktivitas lain
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -66,11 +63,11 @@ class RiwayatPemeliharaanActivity : AppCompatActivity() {
         }
 
         // Inisialisasi RecyclerView
-        recyclerView = findViewById(R.id.recyclerViewRiwayatMedia)
+        recyclerView = findViewById(R.id.recyclerViewRiwayatPemeliharaan)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Inisialisasi Adapter
-        adapter = RiwayatBarangAdapter(emptyList(), startForResult) {
+        adapter = RiwayatPemeliharaanAdapter(emptyList(), startForResult) {
             refreshData()
         }
 
@@ -82,10 +79,10 @@ class RiwayatPemeliharaanActivity : AppCompatActivity() {
     }
 
     private fun fetchPemeliharaan() {
-        RetrofitClient.instance.riwayatBarang().enqueue(object : Callback<ApiResponse<List<Barang>>> {
+        RetrofitClient.instance.riwayatPemeliharaan().enqueue(object : Callback<ApiResponse<List<Pemeliharaan>>> {
             override fun onResponse(
-                call: Call<ApiResponse<List<Barang>>>,
-                response: Response<ApiResponse<List<Barang>>>
+                call: Call<ApiResponse<List<Pemeliharaan>>>,
+                response: Response<ApiResponse<List<Pemeliharaan>>>
             ) {
                 Log.d("RiwayatMedia", "Response diterima dengan kode: ${response.code()}")
 
@@ -107,8 +104,9 @@ class RiwayatPemeliharaanActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<List<Barang>>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<List<Pemeliharaan>>>, t: Throwable) {
                 Log.e("RiwayatMedia", "Gagal menghubungi server: ${t.localizedMessage}", t)
+                Log.e("RiwayatMedia", "Gagal: ${t.message}", t)
             }
         })
     }
