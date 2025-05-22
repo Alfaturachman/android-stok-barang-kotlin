@@ -101,12 +101,12 @@ interface ApiService {
     fun kodeKategoriOtomatis(): Call<ApiResponse<Kategori>>
 
     @Headers("Content-Type: application/json")
-    @POST("tambah_kategori.php")
-    fun tambahKategori(@Body Kategori: Kategori): Call<ApiResponse<Kategori>>
+    @POST("create_kategori.php")
+    fun tambahKategori(@Body requestBody: RequestBody): Call<ApiResponse<Kategori>>
 
     @Headers("Content-Type: application/json")
     @POST("update_kategori.php")
-    fun editKategori(@Body Kategori: Kategori): Call<ApiResponse<Kategori>>
+    fun editKategori(@Body requestBody: RequestBody): Call<ApiResponse<Kategori>>
 
     @POST("delete_kategori.php")
     fun deleteKategori(@Body body: RequestBody): Call<ResponseBody>
