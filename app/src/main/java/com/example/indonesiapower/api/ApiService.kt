@@ -17,15 +17,17 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface ApiService {
-    // Home
+    //////////////////// Home ////////////////////
     @GET("get_total_data.php")
     fun totalData(): Call<ApiResponse<TotalData>>
 
-    // Login
+
+    //////////////////// Login ////////////////////
     @POST("login.php")
     fun loginUser(@Body body: RequestBody): Call<ResponseBody>
 
-    // Barang CRUD
+
+    //////////////////// Barang CRUD ////////////////////
     @GET("get_all_barang.php")
     fun riwayatBarang(): Call<ApiResponse<List<Barang>>>
 
@@ -72,7 +74,7 @@ interface ApiService {
     fun deleteBarang(@Body body: RequestBody): Call<ResponseBody>
 
 
-    // Pemeliharaan CRUD
+    //////////////////// Pemeliharaan CRUD ////////////////////
     @GET("get_all_pemeliharaan.php")
     fun riwayatPemeliharaan(): Call<ApiResponse<List<Pemeliharaan>>>
 
@@ -85,13 +87,13 @@ interface ApiService {
 
     @Headers("Content-Type: application/json")
     @POST("update_pemeliharaan.php")
-    fun editPemeliharaan(@Body Pemeliharaan: Pemeliharaan): Call<ApiResponse<Pemeliharaan>>
+    fun editPemeliharaan(@Body requestBody: RequestBody): Call<ApiResponse<Pemeliharaan>>
 
     @POST("delete_pemeliharaan.php")
     fun deletePemeliharaan(@Body body: RequestBody): Call<ResponseBody>
 
 
-    // Kategori CRUD
+    //////////////////// Kategori CRUD ////////////////////
     @GET("get_all_kategori.php")
     fun riwayatKategori(): Call<ApiResponse<List<Kategori>>>
 
@@ -109,7 +111,7 @@ interface ApiService {
     @POST("delete_kategori.php")
     fun deleteKategori(@Body body: RequestBody): Call<ResponseBody>
 
-    // Petugas CRUD
+    //////////////////// Petugas CRUD ////////////////////
     @GET("get_all_petugas.php")
     fun riwayatPetugas(): Call<ApiResponse<List<Petugas>>>
 }

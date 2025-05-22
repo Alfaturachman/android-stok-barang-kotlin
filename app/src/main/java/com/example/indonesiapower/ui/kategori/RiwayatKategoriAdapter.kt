@@ -69,7 +69,7 @@ class RiwayatKategoriAdapter(
                 putExtra("jumlah", kategori.jumlah)
                 putExtra("dibuat_tgl", kategori.dibuat_tgl)
             }
-            context.startActivity(intent)
+            startForResult.launch(intent)
         }
 
         // Tombol Hapus

@@ -94,7 +94,7 @@ class RiwayatPemeliharaanAdapter(
                 putExtra("catatan_tambahan", pemeliharaan.catatan_tambahan)
                 putExtra("tgl_pemeliharaan_selanjutnya", pemeliharaan.tgl_pemeliharaan_selanjutnya)
             }
-            context.startActivity(intent)
+            startForResult.launch(intent)
         }
 
         // Delete button click

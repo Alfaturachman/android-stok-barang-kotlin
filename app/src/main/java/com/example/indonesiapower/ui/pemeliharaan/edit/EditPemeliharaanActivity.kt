@@ -1,6 +1,7 @@
 package com.example.indonesiapower.ui.pemeliharaan.edit
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +11,7 @@ import com.example.indonesiapower.R
 import com.example.indonesiapower.api.ApiResponse
 import com.example.indonesiapower.api.RetrofitClient
 import com.example.indonesiapower.model.Barang
+import com.example.indonesiapower.model.Pemeliharaan
 import com.example.indonesiapower.model.Petugas
 import com.google.android.material.textfield.TextInputEditText
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -19,6 +21,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Calendar
 
 class EditPemeliharaanActivity : AppCompatActivity() {
 
@@ -36,6 +39,7 @@ class EditPemeliharaanActivity : AppCompatActivity() {
     private lateinit var btnSimpan: Button
     private lateinit var btnKembali: ImageButton
 
+    private var selectedDate: String = ""
     private lateinit var petugasList: List<Petugas>
 
     @SuppressLint("MissingInflatedId")
@@ -81,6 +85,7 @@ class EditPemeliharaanActivity : AppCompatActivity() {
         etTanggalPemeliharaanSelanjutnya.setText(tglPemeliharaanSelanjutnya)
 
         fetchBarangByKode(kodeBarang.toString())
+        loadNamaPetugas()
         
         val kondisiList = listOf("Sudah Diperbaiki", "Rusak", "Butuh Perbaikan")
         val adapterKondisi = ArrayAdapter(
@@ -91,6 +96,114 @@ class EditPemeliharaanActivity : AppCompatActivity() {
         adapterKondisi.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerKondisi.adapter = adapterKondisi
 
+        etTanggalBarangMasuk.isFocusable = false
+        etTanggalBarangMasuk.isClickable = true
+        etTanggalBarangMasuk.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                selectedDate = String.format("%02d-%02d-%04d", selectedDay, selectedMonth + 1, selectedYear)
+                etTanggalBarangMasuk.setText(selectedDate)
+            }, year, month, day)
+
+            datePicker.show()
+        }
+
+        etTanggalPemeliharaanSelanjutnya.isFocusable = false
+        etTanggalPemeliharaanSelanjutnya.isClickable = true
+        etTanggalPemeliharaanSelanjutnya.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                selectedDate = String.format("%02d-%02d-%04d", selectedDay, selectedMonth + 1, selectedYear)
+                etTanggalPemeliharaanSelanjutnya.setText(selectedDate)
+            }, year, month, day)
+
+            datePicker.show()
+        }
+
+        btnSimpan.setOnClickListener {
+            try {
+                // Ambil data dari UI
+                val kodeBarang = etKodeBarang.text?.toString()?.trim() ?: ""
+                val namaBarang = etNamaBarang.text?.toString()?.trim() ?: ""
+                val pegawai = etPegawai.text?.toString()?.trim() ?: ""
+                val jabatan = etJabatan.text?.toString()?.trim() ?: ""
+                val divisi = etDivisi.text?.toString()?.trim() ?: ""
+                val kondisi = spinnerKondisi.selectedItem?.toString()?.trim() ?: ""
+                val namaPetugas = spinnerNamaPetugas.selectedItem?.toString()?.trim() ?: ""
+                val tanggalBarangMasuk = etTanggalBarangMasuk.text?.toString()?.trim() ?: ""
+                val catatanTambahan = etCatatanTambahan.text?.toString()?.trim() ?: ""
+                val tanggalPemeliharaanSelanjutnya = etTanggalPemeliharaanSelanjutnya.text?.toString()?.trim() ?: ""
+
+                // Buat JSON string manual
+                val jsonString = """
+            {
+                "kode_barang": "$kodeBarang",
+                "nama_barang": "$namaBarang",
+                "pegawai": "$pegawai",
+                "jabatan": "$jabatan",
+                "divisi": "$divisi",
+                "kondisi": "$kondisi",
+                "nama_petugas": "$namaPetugas",
+                "tanggal_barang_masuk": "$tanggalBarangMasuk",
+                "catatan_tambahan": "$catatanTambahan",
+                "tanggal_pemeliharaan_selanjutnya": "$tanggalPemeliharaanSelanjutnya"
+            }
+        """.trimIndent()
+
+                // Buat RequestBody dari JSON string
+                val requestBody = RequestBody.create(
+                    "application/json; charset=utf-8".toMediaTypeOrNull(),
+                    jsonString
+                )
+
+                // Panggil API
+                RetrofitClient.instance.editPemeliharaan(requestBody).enqueue(object : Callback<ApiResponse<Pemeliharaan>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<Pemeliharaan>>,
+                        response: Response<ApiResponse<Pemeliharaan>>
+                    ) {
+                        if (response.isSuccessful) {
+                            response.body()?.let { apiResponse ->
+                                if (apiResponse.status == true) {
+                                    Toast.makeText(this@EditPemeliharaanActivity, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                                    setResult(RESULT_OK)
+                                    finish()
+                                } else {
+                                    Toast.makeText(this@EditPemeliharaanActivity, apiResponse.message ?: "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
+                                }
+                            } ?: run {
+                                Toast.makeText(this@EditPemeliharaanActivity, "Response body is null", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            val errorMsg = try {
+                                response.errorBody()?.string() ?: "Unknown error"
+                            } catch (e: Exception) {
+                                "Error reading error body: ${e.message}"
+                            }
+                            Log.e("EditPemeliharaanActivity", "API Error: $errorMsg")
+                            Toast.makeText(this@EditPemeliharaanActivity, "Error: ${response.code()} - $errorMsg", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<Pemeliharaan>>, t: Throwable) {
+                        Log.e("EditPemeliharaanActivity", "Network error: ${t.message}", t)
+                        Toast.makeText(this@EditPemeliharaanActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+
+            } catch (e: Exception) {
+                Log.e("EditPemeliharaanActivity", "Error: ${e.message}", e)
+                Toast.makeText(this, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun fetchBarangByKode(selectedKode: String) {
