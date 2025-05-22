@@ -59,7 +59,7 @@ class RiwayatKategoriActivity : AppCompatActivity() {
         val buttonTambah: Button = findViewById(R.id.buttonTambah)
         buttonTambah.setOnClickListener {
             val intent = Intent(this@RiwayatKategoriActivity, TambahKategoriActivity::class.java)
-            startActivity(intent)
+            startForResult.launch(intent)
         }
 
         // Inisialisasi RecyclerView

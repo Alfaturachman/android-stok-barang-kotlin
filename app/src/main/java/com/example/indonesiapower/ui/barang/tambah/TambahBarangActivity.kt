@@ -130,7 +130,7 @@ class TambahBarangActivity : AppCompatActivity() {
     }
 
     private fun loadKategori() {
-        RetrofitClient.instance.getKategori().enqueue(object : Callback<ApiResponse<List<Kategori>>> {
+        RetrofitClient.instance.riwayatKategori().enqueue(object : Callback<ApiResponse<List<Kategori>>> {
             override fun onResponse(
                 call: Call<ApiResponse<List<Kategori>>>,
                 response: Response<ApiResponse<List<Kategori>>>

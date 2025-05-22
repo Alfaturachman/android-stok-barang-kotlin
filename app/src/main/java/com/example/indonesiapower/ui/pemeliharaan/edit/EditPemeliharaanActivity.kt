@@ -2,16 +2,28 @@ package com.example.indonesiapower.ui.pemeliharaan.edit
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.indonesiapower.R
+import com.example.indonesiapower.api.ApiResponse
+import com.example.indonesiapower.api.RetrofitClient
+import com.example.indonesiapower.model.Barang
+import com.example.indonesiapower.model.Petugas
 import com.google.android.material.textfield.TextInputEditText
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class EditPemeliharaanActivity : AppCompatActivity() {
 
     // View declarations
-    private lateinit var spinnerKodeBarang: Spinner
+    private lateinit var etKodeBarang: TextInputEditText
     private lateinit var etNamaBarang: TextInputEditText
     private lateinit var etPegawai: TextInputEditText
     private lateinit var etJabatan: TextInputEditText
@@ -24,20 +36,7 @@ class EditPemeliharaanActivity : AppCompatActivity() {
     private lateinit var btnSimpan: Button
     private lateinit var btnKembali: ImageButton
 
-    // Data dummy di dalam activity
-    private val barangData = listOf(
-        BarangDummy(101, "Laptop Asus", "Andi", "Manager", "IT"),
-        BarangDummy(102, "Printer Canon", "Budi", "Staff", "Admin"),
-        BarangDummy(103, "Proyektor Epson", "Citra", "Supervisor", "Marketing")
-    )
-
-    data class BarangDummy(
-        val kodeBarang: Int,
-        val namaBarang: String,
-        val pegawai: String,
-        val jabatan: String,
-        val divisi: String
-    )
+    private lateinit var petugasList: List<Petugas>
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,8 +50,8 @@ class EditPemeliharaanActivity : AppCompatActivity() {
 
         // Inisialisasi Views
         btnKembali = findViewById(R.id.btnKembali)
-        spinnerKodeBarang = findViewById(R.id.spinnerKodeBarang)
         etNamaBarang = findViewById(R.id.etNamaBarang)
+        etKodeBarang = findViewById(R.id.etKodeBarang)
         etPegawai = findViewById(R.id.etPegawai)
         etJabatan = findViewById(R.id.etJabatan)
         etDivisi = findViewById(R.id.etDivisi)
@@ -69,66 +68,102 @@ class EditPemeliharaanActivity : AppCompatActivity() {
         }
 
         // Ambil data dari intent (jika ada)
-        val idPemeliharaan = intent.getStringExtra("id_pemeliharaan")
-        val kodeBarangIntent = intent.getStringExtra("kode_barang")
+        val idPemeliharaan = intent.getIntExtra("id_pemeliharaan", 0)
+        val kodeBarang = intent.getIntExtra("kode_barang", 0)
         val tglBarangMasuk = intent.getStringExtra("tgl_barang_masuk")
         val kondisi = intent.getStringExtra("kondisi")
         val catatanTambahan = intent.getStringExtra("catatan_tambahan")
         val tglPemeliharaanSelanjutnya = intent.getStringExtra("tgl_pemeliharaan_selanjutnya")
 
-        // 1. Set data dummy ke Spinner Kode Barang
-        val kodeBarangList = barangData.map { it.kodeBarang.toString() }
+        etKodeBarang.setText(kodeBarang.toString())
+        etCatatanTambahan.setText(catatanTambahan)
+        etTanggalBarangMasuk.setText(tglBarangMasuk)
+        etTanggalPemeliharaanSelanjutnya.setText(tglPemeliharaanSelanjutnya)
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, kodeBarangList)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerKodeBarang.adapter = adapter
+        fetchBarangByKode(kodeBarang.toString())
+        
+        val kondisiList = listOf("Sudah Diperbaiki", "Rusak", "Butuh Perbaikan")
+        val adapterKondisi = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            kondisiList
+        )
+        adapterKondisi.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerKondisi.adapter = adapterKondisi
 
-        // 2. Jika data intent kode barang ada, set spinner ke posisi kode barang tersebut
-        if (kodeBarangIntent != null) {
-            val index = kodeBarangList.indexOf(kodeBarangIntent)
-            if (index >= 0) {
-                spinnerKodeBarang.setSelection(index)
-            }
-        }
+    }
 
-        // 3. Spinner listener untuk update EditText sesuai kode barang terpilih
-        spinnerKodeBarang.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedKode = kodeBarangList[position].toInt()
-                val selectedBarang = barangData.find { it.kodeBarang == selectedKode }
+    private fun fetchBarangByKode(selectedKode: String) {
+        // Buat JSON body secara manual
+        val jsonObject = JSONObject()
+        jsonObject.put("kode_barang", selectedKode)
+        val jsonBody = jsonObject.toString()
+        val requestBody: RequestBody = jsonBody.toRequestBody("application/json".toMediaTypeOrNull())
 
-                if (selectedBarang != null) {
-                    etNamaBarang.setText(selectedBarang.namaBarang)
-                    etPegawai.setText(selectedBarang.pegawai)
-                    etJabatan.setText(selectedBarang.jabatan)
-                    etDivisi.setText(selectedBarang.divisi)
+        // Panggil API Retrofit dengan RequestBody yang sudah dibuat
+        RetrofitClient.instance.getBarangByKode(requestBody)
+            .enqueue(object : Callback<ApiResponse<List<Barang>>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<List<Barang>>>,
+                    response: Response<ApiResponse<List<Barang>>>
+                ) {
+                    if (response.isSuccessful && response.body()?.status == true) {
+                        val dataBarang = response.body()?.data
+                        if (!dataBarang.isNullOrEmpty()) {
+                            val barang = dataBarang[0]  // ambil item pertama
+                            etNamaBarang.setText(barang.nama_barang)
+                            etPegawai.setText(barang.pegawai)
+                            etJabatan.setText(barang.jabatan)
+                            etDivisi.setText(barang.divisi)
+                        } else {
+                            clearEditTexts()
+                        }
+                    } else {
+                        clearEditTexts()
+                        Toast.makeText(this@EditPemeliharaanActivity, "Data tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<List<Barang>>>, t: Throwable) {
+                    clearEditTexts()
+                    Toast.makeText(this@EditPemeliharaanActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    private fun loadNamaPetugas() {
+        RetrofitClient.instance.riwayatPetugas().enqueue(object : Callback<ApiResponse<List<Petugas>>> {
+            override fun onResponse(call: Call<ApiResponse<List<Petugas>>>, response: Response<ApiResponse<List<Petugas>>>) {
+                if (response.isSuccessful && response.body() != null) {
+                    petugasList = response.body()!!.data ?: emptyList()
+
+                    val namaPetugasList = petugasList.map { it.nama.toString() }
+
+                    val adapter = ArrayAdapter(
+                        this@EditPemeliharaanActivity,
+                        android.R.layout.simple_spinner_item,
+                        namaPetugasList
+                    )
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    spinnerNamaPetugas.adapter = adapter
+
+                    spinnerNamaPetugas.setSelection(0, true)
+
                 } else {
-                    etNamaBarang.setText("")
-                    etPegawai.setText("")
-                    etJabatan.setText("")
-                    etDivisi.setText("")
+                    Toast.makeText(this@EditPemeliharaanActivity, "Gagal load data barang", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                etNamaBarang.setText("")
-                etPegawai.setText("")
-                etJabatan.setText("")
-                etDivisi.setText("")
+            override fun onFailure(call: Call<ApiResponse<List<Petugas>>>, t: Throwable) {
+                Toast.makeText(this@EditPemeliharaanActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
-        }
+        })
+    }
 
-        // 4. Set data lain dari intent ke EditText (jika ada)
-        etTanggalBarangMasuk.setText(tglBarangMasuk)
-        etCatatanTambahan.setText(catatanTambahan)
-        etTanggalPemeliharaanSelanjutnya.setText(tglPemeliharaanSelanjutnya)
-
-        // Jika ingin langsung set data dari intent juga (bisa di-comment jika ingin pakai data dummy sepenuhnya)
-        /*
-        etNamaBarang.setText(namaBarangIntent)
-        etPegawai.setText(pegawaiIntent)
-        etJabatan.setText(jabatanIntent)
-        etDivisi.setText(divisiIntent)
-        */
+    private fun clearEditTexts() {
+        etNamaBarang.setText("")
+        etPegawai.setText("")
+        etJabatan.setText("")
+        etDivisi.setText("")
     }
 }

@@ -3,6 +3,8 @@ package com.example.indonesiapower.api
 import com.example.indonesiapower.model.Barang
 import com.example.indonesiapower.model.Kategori
 import com.example.indonesiapower.model.Pemeliharaan
+import com.example.indonesiapower.model.Petugas
+import com.example.indonesiapower.model.TotalData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -15,6 +17,10 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface ApiService {
+    // Home
+    @GET("get_total_data.php")
+    fun totalData(): Call<ApiResponse<TotalData>>
+
     // Login
     @POST("login.php")
     fun loginUser(@Body body: RequestBody): Call<ResponseBody>
@@ -65,13 +71,17 @@ interface ApiService {
     @POST("delete_barang.php")
     fun deleteBarang(@Body body: RequestBody): Call<ResponseBody>
 
+
     // Pemeliharaan CRUD
     @GET("get_all_pemeliharaan.php")
     fun riwayatPemeliharaan(): Call<ApiResponse<List<Pemeliharaan>>>
 
     @Headers("Content-Type: application/json")
-    @POST("tambah_pemeliharaan.php")
-    fun tambahPemeliharaan(@Body Pemeliharaan: Pemeliharaan): Call<ApiResponse<Pemeliharaan>>
+    @POST("create_pemeliharaan.php")
+    fun tambahPemeliharaan(@Body requestBody: RequestBody): Call<ApiResponse<Pemeliharaan>>
+
+    @POST("get_barang_by_kode.php")
+    fun getBarangByKode(@Body body: RequestBody): Call<ApiResponse<List<Barang>>>
 
     @Headers("Content-Type: application/json")
     @POST("update_pemeliharaan.php")
@@ -96,9 +106,10 @@ interface ApiService {
     @POST("update_kategori.php")
     fun editKategori(@Body Kategori: Kategori): Call<ApiResponse<Kategori>>
 
-    @GET("get_all_kategori.php")
-    fun getKategori(): Call<ApiResponse<List<Kategori>>>
-
     @POST("delete_kategori.php")
     fun deleteKategori(@Body body: RequestBody): Call<ResponseBody>
+
+    // Petugas CRUD
+    @GET("get_all_petugas.php")
+    fun riwayatPetugas(): Call<ApiResponse<List<Petugas>>>
 }

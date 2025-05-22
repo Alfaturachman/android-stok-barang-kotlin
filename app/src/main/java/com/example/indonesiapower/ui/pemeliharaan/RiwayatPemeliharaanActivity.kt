@@ -59,7 +59,7 @@ class RiwayatPemeliharaanActivity : AppCompatActivity() {
         val buttonTambah: Button = findViewById(R.id.buttonTambah)
         buttonTambah.setOnClickListener {
             val intent = Intent(this@RiwayatPemeliharaanActivity, TambahPemeliharaanActivity::class.java)
-            startActivity(intent)
+            startForResult.launch(intent)
         }
 
         // Inisialisasi RecyclerView
