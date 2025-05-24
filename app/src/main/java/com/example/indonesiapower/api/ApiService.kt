@@ -1,5 +1,6 @@
 package com.example.indonesiapower.api
 
+import com.example.indonesiapower.model.Admin
 import com.example.indonesiapower.model.Barang
 import com.example.indonesiapower.model.Kategori
 import com.example.indonesiapower.model.Pemeliharaan
@@ -117,7 +118,35 @@ interface ApiService {
     @POST("delete_kategori.php")
     fun deleteKategori(@Body body: RequestBody): Call<ResponseBody>
 
+
+    //////////////////// Admin CRUD ////////////////////
+    @GET("get_all_admin.php")
+    fun riwayatAdmin(): Call<ApiResponse<List<Admin>>>
+
+    @Headers("Content-Type: application/json")
+    @POST("create_admin.php")
+    fun tambahAdmin(@Body requestBody: RequestBody): Call<ApiResponse<Admin>>
+
+    @Headers("Content-Type: application/json")
+    @POST("update_admin.php")
+    fun editAdmin(@Body requestBody: RequestBody): Call<ApiResponse<Admin>>
+
+    @POST("delete_admin.php")
+    fun deleteAdmin(@Body body: RequestBody): Call<ResponseBody>
+
+
     //////////////////// Petugas CRUD ////////////////////
     @GET("get_all_petugas.php")
     fun riwayatPetugas(): Call<ApiResponse<List<Petugas>>>
+
+    @Headers("Content-Type: application/json")
+    @POST("create_petugas.php")
+    fun tambahPetugas(@Body requestBody: RequestBody): Call<ApiResponse<Petugas>>
+
+    @Headers("Content-Type: application/json")
+    @POST("update_petugas.php")
+    fun editPetugas(@Body requestBody: RequestBody): Call<ApiResponse<Petugas>>
+
+    @POST("delete_petugas.php")
+    fun deletePetugas(@Body body: RequestBody): Call<ResponseBody>
 }

@@ -9,10 +9,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.indonesiapower.databinding.FragmentDashboardBinding
+import com.example.indonesiapower.ui.admin.RiwayatAdminActivity
 import com.example.indonesiapower.ui.barang.RiwayatBarangActivity
 import com.example.indonesiapower.ui.kategori.RiwayatKategoriActivity
 import com.example.indonesiapower.ui.pemeliharaan.RiwayatPemeliharaanActivity
 import com.example.indonesiapower.ui.penerimaan.RiwayatPenerimaanActivity
+import com.example.indonesiapower.ui.petugas.RiwayatPetugasActivity
 
 class DashboardFragment : Fragment() {
 
@@ -52,6 +54,18 @@ class DashboardFragment : Fragment() {
         // Penerimaan
         binding.cardViewPenerimaan.setOnClickListener {
             val intent = Intent(requireContext(), RiwayatPenerimaanActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Admin
+        binding.cardViewManajemenAdmin.setOnClickListener {
+            val intent = Intent(requireContext(), RiwayatAdminActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Petugas
+        binding.cardViewDataPetugas.setOnClickListener {
+            val intent = Intent(requireContext(), RiwayatPetugasActivity::class.java)
             startActivity(intent)
         }
 
