@@ -3,6 +3,7 @@ package com.example.indonesiapower.api
 import com.example.indonesiapower.model.Barang
 import com.example.indonesiapower.model.Kategori
 import com.example.indonesiapower.model.Pemeliharaan
+import com.example.indonesiapower.model.Penerimaan
 import com.example.indonesiapower.model.Petugas
 import com.example.indonesiapower.model.TotalData
 import okhttp3.MultipartBody
@@ -91,6 +92,11 @@ interface ApiService {
 
     @POST("delete_pemeliharaan.php")
     fun deletePemeliharaan(@Body body: RequestBody): Call<ResponseBody>
+
+
+    //////////////////// Penerimaan CRUD ////////////////////
+    @GET("get_all_penerimaan.php")
+    fun riwayatPenerimaan(): Call<ApiResponse<List<Penerimaan>>>
 
 
     //////////////////// Kategori CRUD ////////////////////

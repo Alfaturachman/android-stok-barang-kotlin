@@ -5,7 +5,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private val ip: String = "192.168.1.6"
+    private val ip: String = "192.168.0.105"
 
     private val BASE_URL = "http://$ip/stokbarang/api/"
 
