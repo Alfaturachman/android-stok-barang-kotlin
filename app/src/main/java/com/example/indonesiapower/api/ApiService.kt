@@ -104,9 +104,6 @@ interface ApiService {
     @GET("get_all_kategori.php")
     fun riwayatKategori(): Call<ApiResponse<List<Kategori>>>
 
-    @GET("get_otomatis_kode_kategori.php")
-    fun kodeKategoriOtomatis(): Call<ApiResponse<Kategori>>
-
     @Headers("Content-Type: application/json")
     @POST("create_kategori.php")
     fun tambahKategori(@Body requestBody: RequestBody): Call<ApiResponse<Kategori>>
