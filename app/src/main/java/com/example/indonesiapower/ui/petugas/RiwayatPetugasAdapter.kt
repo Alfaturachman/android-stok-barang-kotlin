@@ -91,7 +91,7 @@ class RiwayatPetugasAdapter(
 
     private fun deletePetugas(petugasId: Int, context: Context) {
         val jsonObject = JSONObject().apply {
-            put("id", petugasId)
+            put("id_petugas", petugasId)
         }
 
         val requestBody = jsonObject.toString()

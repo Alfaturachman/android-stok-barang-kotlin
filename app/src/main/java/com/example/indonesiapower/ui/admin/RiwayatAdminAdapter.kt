@@ -94,7 +94,7 @@ class RiwayatAdminAdapter(
 
     private fun deleteAdmin(adminId: Int, context: Context) {
         val jsonObject = JSONObject().apply {
-            put("id", adminId)
+            put("id_admin", adminId)
         }
 
         val requestBody = jsonObject.toString()
