@@ -74,6 +74,9 @@ class TambahPetugasActivity : AppCompatActivity() {
             }
         """.trimIndent()
 
+                // Log isi JSON yang akan dikirim
+                Log.d("TambahPetugasActivity", "JSON to be sent: $jsonString")
+
                 // Buat RequestBody dari JSON string
                 val requestBody = RequestBody.create(
                     "application/json; charset=utf-8".toMediaTypeOrNull(),
@@ -81,21 +84,26 @@ class TambahPetugasActivity : AppCompatActivity() {
                 )
 
                 // Panggil API
-                RetrofitClient.instance.editPetugas(requestBody).enqueue(object : Callback<ApiResponse<Petugas>> {
+                RetrofitClient.instance.tambahPetugas(requestBody).enqueue(object : Callback<ApiResponse<Petugas>> {
                     override fun onResponse(
                         call: Call<ApiResponse<Petugas>>,
                         response: Response<ApiResponse<Petugas>>
                     ) {
+                        Log.d("TambahPetugasActivity", "Response code: ${response.code()}")
                         if (response.isSuccessful) {
                             response.body()?.let { apiResponse ->
+                                Log.d("TambahPetugasActivity", "Response body: $apiResponse")
+
                                 if (apiResponse.status == true) {
                                     Toast.makeText(this@TambahPetugasActivity, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
                                     setResult(RESULT_OK)
                                     finish()
                                 } else {
+                                    Log.w("TambahPetugasActivity", "Gagal menyimpan data: ${apiResponse.message}")
                                     Toast.makeText(this@TambahPetugasActivity, apiResponse.message ?: "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
                                 }
                             } ?: run {
+                                Log.e("TambahPetugasActivity", "Response body is null")
                                 Toast.makeText(this@TambahPetugasActivity, "Response body is null", Toast.LENGTH_SHORT).show()
                             }
                         } else {
@@ -104,19 +112,19 @@ class TambahPetugasActivity : AppCompatActivity() {
                             } catch (e: Exception) {
                                 "Error reading error body: ${e.message}"
                             }
-                            Log.e("EditAdminActivity", "API Error: $errorMsg")
+                            Log.e("TambahPetugasActivity", "API Error (${response.code()}): $errorMsg")
                             Toast.makeText(this@TambahPetugasActivity, "Error: ${response.code()} - $errorMsg", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onFailure(call: Call<ApiResponse<Petugas>>, t: Throwable) {
-                        Log.e("EditAdminActivity", "Network error: ${t.message}", t)
+                        Log.e("TambahPetugasActivity", "Network error: ${t.message}", t)
                         Toast.makeText(this@TambahPetugasActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
 
             } catch (e: Exception) {
-                Log.e("EditAdminActivity", "Error: ${e.message}", e)
+                Log.e("TambahPetugasActivity", "Exception during request: ${e.message}", e)
                 Toast.makeText(this, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }

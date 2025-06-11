@@ -74,6 +74,9 @@ class TambahAdminActivity : AppCompatActivity() {
             }
         """.trimIndent()
 
+                // Log isi JSON yang akan dikirim
+                Log.d("TambahAdminActivity", "JSON to be sent: $jsonString")
+
                 // Buat RequestBody dari JSON string
                 val requestBody = RequestBody.create(
                     "application/json; charset=utf-8".toMediaTypeOrNull(),
@@ -81,13 +84,16 @@ class TambahAdminActivity : AppCompatActivity() {
                 )
 
                 // Panggil API
-                RetrofitClient.instance.editAdmin(requestBody).enqueue(object : Callback<ApiResponse<Admin>> {
+                RetrofitClient.instance.tambahAdmin(requestBody).enqueue(object : Callback<ApiResponse<Admin>> {
                     override fun onResponse(
                         call: Call<ApiResponse<Admin>>,
                         response: Response<ApiResponse<Admin>>
                     ) {
+                        Log.d("TambahAdminActivity", "Response code: ${response.code()}")
                         if (response.isSuccessful) {
                             response.body()?.let { apiResponse ->
+                                Log.d("TambahAdminActivity", "Response body: $apiResponse")
+
                                 if (apiResponse.status == true) {
                                     Toast.makeText(this@TambahAdminActivity, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
                                     setResult(RESULT_OK)
@@ -96,6 +102,7 @@ class TambahAdminActivity : AppCompatActivity() {
                                     Toast.makeText(this@TambahAdminActivity, apiResponse.message ?: "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
                                 }
                             } ?: run {
+                                Log.e("TambahAdminActivity", "Response body is null")
                                 Toast.makeText(this@TambahAdminActivity, "Response body is null", Toast.LENGTH_SHORT).show()
                             }
                         } else {
@@ -104,7 +111,7 @@ class TambahAdminActivity : AppCompatActivity() {
                             } catch (e: Exception) {
                                 "Error reading error body: ${e.message}"
                             }
-                            Log.e("TambahAdminActivity", "API Error: $errorMsg")
+                            Log.e("TambahAdminActivity", "API Error (${response.code()}): $errorMsg")
                             Toast.makeText(this@TambahAdminActivity, "Error: ${response.code()} - $errorMsg", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -116,7 +123,7 @@ class TambahAdminActivity : AppCompatActivity() {
                 })
 
             } catch (e: Exception) {
-                Log.e("TambahAdminActivity", "Error: ${e.message}", e)
+                Log.e("TambahAdminActivity", "Exception during request: ${e.message}", e)
                 Toast.makeText(this, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }

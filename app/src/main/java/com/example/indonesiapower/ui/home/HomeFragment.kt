@@ -1,5 +1,6 @@
 package com.example.indonesiapower.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    private var namaUser: String = "Tidak ada"
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,6 +29,9 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+
+        namaUser = getNamaFromSharedPreferences().toString()
+        binding.tvNama.text = namaUser
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,6 +64,11 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun getNamaFromSharedPreferences(): String? {
+        val sharedPreferences = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("nama", "0")
     }
 
     override fun onDestroyView() {

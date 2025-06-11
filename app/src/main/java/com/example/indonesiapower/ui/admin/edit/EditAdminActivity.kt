@@ -73,7 +73,9 @@ class EditAdminActivity : AppCompatActivity() {
                 val password = etPassword.text?.toString()?.trim() ?: ""
                 val id = intent.getIntExtra("id", -1)
 
+                // Validasi ID
                 if (id == -1) {
+                    Log.e("EditAdminActivity", "ID admin tidak valid: $id")
                     Toast.makeText(this, "ID admin tidak valid", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -89,6 +91,9 @@ class EditAdminActivity : AppCompatActivity() {
             }
         """.trimIndent()
 
+                // Log isi JSON yang dikirim
+                Log.d("EditAdminActivity", "JSON to be sent: $jsonString")
+
                 // Buat RequestBody dari JSON string
                 val requestBody = RequestBody.create(
                     "application/json; charset=utf-8".toMediaTypeOrNull(),
@@ -101,16 +106,22 @@ class EditAdminActivity : AppCompatActivity() {
                         call: Call<ApiResponse<Admin>>,
                         response: Response<ApiResponse<Admin>>
                     ) {
+                        Log.d("EditAdminActivity", "Response code: ${response.code()}")
+
                         if (response.isSuccessful) {
                             response.body()?.let { apiResponse ->
+                                Log.d("EditAdminActivity", "Response body: $apiResponse")
+
                                 if (apiResponse.status == true) {
                                     Toast.makeText(this@EditAdminActivity, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
                                     setResult(RESULT_OK)
                                     finish()
                                 } else {
+                                    Log.w("EditAdminActivity", "Gagal menyimpan data: ${apiResponse.message}")
                                     Toast.makeText(this@EditAdminActivity, apiResponse.message ?: "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
                                 }
                             } ?: run {
+                                Log.e("EditAdminActivity", "Response body is null")
                                 Toast.makeText(this@EditAdminActivity, "Response body is null", Toast.LENGTH_SHORT).show()
                             }
                         } else {
@@ -119,7 +130,7 @@ class EditAdminActivity : AppCompatActivity() {
                             } catch (e: Exception) {
                                 "Error reading error body: ${e.message}"
                             }
-                            Log.e("EditAdminActivity", "API Error: $errorMsg")
+                            Log.e("EditAdminActivity", "API Error (${response.code()}): $errorMsg")
                             Toast.makeText(this@EditAdminActivity, "Error: ${response.code()} - $errorMsg", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -131,7 +142,7 @@ class EditAdminActivity : AppCompatActivity() {
                 })
 
             } catch (e: Exception) {
-                Log.e("EditAdminActivity", "Error: ${e.message}", e)
+                Log.e("EditAdminActivity", "Exception during request: ${e.message}", e)
                 Toast.makeText(this, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }

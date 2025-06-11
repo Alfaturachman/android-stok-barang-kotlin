@@ -62,7 +62,6 @@ class EditPetugasActivity : AppCompatActivity() {
         etUsername.setText(username)
         etPassword.setText(password)
 
-        // Tombol simpan
         btnSimpan.setOnClickListener {
             try {
                 // Ambil data dari UI
@@ -72,7 +71,9 @@ class EditPetugasActivity : AppCompatActivity() {
                 val password = etPassword.text?.toString()?.trim() ?: ""
                 val id = intent.getIntExtra("id", -1)
 
+                // Validasi ID
                 if (id == -1) {
+                    Log.e("EditPetugasActivity", "ID petugas tidak valid: $id")
                     Toast.makeText(this, "ID admin tidak valid", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -88,6 +89,9 @@ class EditPetugasActivity : AppCompatActivity() {
             }
         """.trimIndent()
 
+                // Logging JSON sebelum dikirim
+                Log.d("EditPetugasActivity", "JSON to be sent: $jsonString")
+
                 // Buat RequestBody dari JSON string
                 val requestBody = RequestBody.create(
                     "application/json; charset=utf-8".toMediaTypeOrNull(),
@@ -100,16 +104,22 @@ class EditPetugasActivity : AppCompatActivity() {
                         call: Call<ApiResponse<Petugas>>,
                         response: Response<ApiResponse<Petugas>>
                     ) {
+                        Log.d("EditPetugasActivity", "Response code: ${response.code()}")
+
                         if (response.isSuccessful) {
                             response.body()?.let { apiResponse ->
+                                Log.d("EditPetugasActivity", "Response body: $apiResponse")
+
                                 if (apiResponse.status == true) {
                                     Toast.makeText(this@EditPetugasActivity, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
                                     setResult(RESULT_OK)
                                     finish()
                                 } else {
+                                    Log.w("EditPetugasActivity", "Gagal menyimpan data: ${apiResponse.message}")
                                     Toast.makeText(this@EditPetugasActivity, apiResponse.message ?: "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
                                 }
                             } ?: run {
+                                Log.e("EditPetugasActivity", "Response body is null")
                                 Toast.makeText(this@EditPetugasActivity, "Response body is null", Toast.LENGTH_SHORT).show()
                             }
                         } else {
@@ -118,19 +128,19 @@ class EditPetugasActivity : AppCompatActivity() {
                             } catch (e: Exception) {
                                 "Error reading error body: ${e.message}"
                             }
-                            Log.e("EditAdminActivity", "API Error: $errorMsg")
+                            Log.e("EditPetugasActivity", "API Error (${response.code()}): $errorMsg")
                             Toast.makeText(this@EditPetugasActivity, "Error: ${response.code()} - $errorMsg", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onFailure(call: Call<ApiResponse<Petugas>>, t: Throwable) {
-                        Log.e("EditAdminActivity", "Network error: ${t.message}", t)
+                        Log.e("EditPetugasActivity", "Network error: ${t.message}", t)
                         Toast.makeText(this@EditPetugasActivity, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
 
             } catch (e: Exception) {
-                Log.e("EditAdminActivity", "Error: ${e.message}", e)
+                Log.e("EditPetugasActivity", "Exception during request: ${e.message}", e)
                 Toast.makeText(this, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
